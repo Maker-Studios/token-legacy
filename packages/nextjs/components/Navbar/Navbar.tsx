@@ -1,5 +1,6 @@
 import { useContext } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { AddressBadge } from "../AddressBadge";
 import Icon from "../Icons";
 import Logo from "../Logo/Logo";
@@ -25,10 +26,15 @@ const Navbar: React.FC = (): JSX.Element => {
 
   const isBeneficiaryPage = pathname.startsWith("/beneficiary");
 
+  const legacyAddress = router.query.legacyAddress;
+
   return (
     <header className={styles.Navbar}>
       <nav>
-        <Logo className="cursor-pointer hover:opacity-70 transition" onClick={() => router.push("/")} />
+        <Logo
+          className="cursor-pointer hover:opacity-70 transition"
+          onClick={() => router.push(`/legacy/${legacyAddress}`)}
+        />
 
         <ul>
           <li>
@@ -48,7 +54,7 @@ const Navbar: React.FC = (): JSX.Element => {
           </li>
 
           <li>
-            <Button size={"icon"} variant={"icon"} onClick={() => router.push("/legacy/release-date")}>
+            <Button size={"icon"} variant={"icon"} onClick={() => router.push(`/legacy/${legacyAddress}/release-date`)}>
               <Icon title="stop-watch" />
             </Button>
           </li>

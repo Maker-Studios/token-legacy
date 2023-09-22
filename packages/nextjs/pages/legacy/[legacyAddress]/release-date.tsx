@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { fromUnixTime } from "date-fns";
 import type { NextPage } from "next";
 import { CalendarDialog } from "~~/components/CalendarDialog";
 import WalletLayout from "~~/components/Layout";
 import { Button } from "~~/components/ui/button";
 import { toast } from "~~/components/ui/use-toast";
+import { useFetchLegacyQuery } from "~~/gql/types.generated";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { cn } from "~~/lib/utils";
 
@@ -27,6 +29,19 @@ const ReleaseDatePage: NextPage = (): JSX.Element => {
     address: legacyAddress as `0x${string}`,
     args: [0n],
   });
+
+  const { data: legacyData } = useFetchLegacyQuery({
+    variables: {
+      address: legacyAddress.toLowerCase(),
+    },
+  });
+
+  const unlocksAt = (legacyData?.legacy?.unlocksAt ?? 0) * 1000;
+
+  useEffect(() => {
+    const futureDate = fromUnixTime(unlocksAt / 1000);
+    setDate(futureDate);
+  }, [unlocksAt]);
 
   const onSaveDateHandler = async () => {
     if (typeof date === "undefined") {
@@ -60,7 +75,7 @@ const ReleaseDatePage: NextPage = (): JSX.Element => {
   };
 
   return (
-    <WalletLayout>
+    <WalletLayout unlocksAt={unlocksAt}>
       <div className="mt-16">
         <div className="max-w-[370px] mx-auto text-center">
           <CalendarDialog currentDate={date} onApplyDate={onApplyDateHandler} />
@@ -70,7 +85,7 @@ const ReleaseDatePage: NextPage = (): JSX.Element => {
           <Button
             className={cn("mt-14", isDateChanged ? "" : "bg-[#273B53] border border-[#587698] text-white")}
             variant={isDateChanged ? "default" : "secondary"}
-            disabled={date ? false : true}
+            disabled={!isDateChanged}
             loading={isLoading}
             onClick={onSaveDateHandler}
           >
