@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter as useRouterNavigation } from "next/navigation";
 import { useRouter } from "next/router";
 import { AddressBadge } from "../AddressBadge";
 import { CalendarDialog } from "../CalendarDialog";
@@ -17,6 +17,7 @@ import { TokenContext } from "~~/providers/TokenProvider";
 
 const Navbar: React.FC = (): JSX.Element => {
   const router = useRouter();
+  const routerNavigation = useRouterNavigation();
   const { toggleTokenImporter } = useContext(TokenContext);
 
   const [date, setDate] = useState<Date | undefined>(undefined);
@@ -69,6 +70,7 @@ const Navbar: React.FC = (): JSX.Element => {
     try {
       // await new Promise(resolve => setTimeout(resolve, 4000));
       await updateReleaseDate({ args: [BigInt(newDate.getTime() / 1000)] });
+      routerNavigation.refresh();
       // router.push("/wallet")
 
       toast({
@@ -86,11 +88,6 @@ const Navbar: React.FC = (): JSX.Element => {
 
     setIsLoading(false);
   };
-
-  // const onApplyDateHandler = (newDate: Date | undefined) => {
-  //   setDate(newDate);
-  //   setIsDateChanged(true);
-  // };
 
   return (
     <header className={styles.Navbar}>
