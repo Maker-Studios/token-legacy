@@ -78,7 +78,9 @@ const ReleaseDatePage: NextPage = (): JSX.Element => {
     <WalletLayout unlocksAt={unlocksAt}>
       <div className="mt-16">
         <div className="max-w-[370px] mx-auto text-center">
-          <CalendarDialog currentDate={date} onApplyDate={onApplyDateHandler} />
+          <CalendarDialog currentDate={date} onApplyDate={onApplyDateHandler} isLoading={false}>
+            Hello
+          </CalendarDialog>
 
           <h6 className="mt-4">on this day, tokens allocated will be released</h6>
 
