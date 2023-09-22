@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { usePathname, useRouter as useRouterNavigation } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/router";
 import { AddressBadge } from "../AddressBadge";
 import { CalendarDialog } from "../CalendarDialog";
@@ -14,11 +14,13 @@ import { useAccount, useEnsName } from "wagmi";
 import { useFetchLegacyQuery } from "~~/gql/types.generated";
 import { useScaffoldContractWrite } from "~~/hooks/scaffold-eth";
 import { TokenContext } from "~~/providers/TokenProvider";
+import { useGraphStore } from "~~/services/store/graphstore";
 
 const Navbar: React.FC = (): JSX.Element => {
   const router = useRouter();
-  const routerNavigation = useRouterNavigation();
   const { toggleTokenImporter } = useContext(TokenContext);
+
+  const [setLatestActionBlock] = useGraphStore(state => [state.setLatestActionBlock, state.isLoading]);
 
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -42,6 +44,9 @@ const Navbar: React.FC = (): JSX.Element => {
     functionName: "registerProof",
     address: legacyAddress as `0x${string}`,
     args: [0n],
+    onBlockConfirmation: async txReceipt => {
+      setLatestActionBlock(Number(txReceipt.blockNumber));
+    },
   });
 
   const { data: legacyData } = useFetchLegacyQuery({
@@ -70,7 +75,7 @@ const Navbar: React.FC = (): JSX.Element => {
     try {
       // await new Promise(resolve => setTimeout(resolve, 4000));
       await updateReleaseDate({ args: [BigInt(newDate.getTime() / 1000)] });
-      routerNavigation.refresh();
+      // routerNavigation.refresh();
       // router.push("/wallet")
 
       toast({
