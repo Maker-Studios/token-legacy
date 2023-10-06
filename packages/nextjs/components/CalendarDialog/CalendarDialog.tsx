@@ -28,11 +28,6 @@ const CalendarDialog: React.FC<CalendarDialogProps> = ({
     setDate(currentDate);
   };
 
-  const handleApplyDate = async () => {
-    await onApplyDate(date);
-    onClose(false);
-  };
-
   return (
     <>
       <Dialog open={open} onOpenChange={open => handleDialogOpenChange(open)}>
@@ -55,7 +50,7 @@ const CalendarDialog: React.FC<CalendarDialogProps> = ({
           </div>
 
           {allowApply && (
-            <Button onClick={handleApplyDate} loading={isLoading}>
+            <Button onClick={async () => await onApplyDate(date)} loading={isLoading}>
               Apply date
             </Button>
           )}
